@@ -1,0 +1,13 @@
+{
+  "name": "ericboyd/328/diner",
+  "authors": [
+    {
+      "name": "Eric Boyd",
+      "email": "boyd.eric@student.greenriver.edu"
+    }
+  ],
+  "require":
+  {
+    "bcosca/fatfree-core": "dev-master"
+  }
+}

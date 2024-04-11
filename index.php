@@ -17,11 +17,11 @@ $f3 = Base::instance();
 
 // Define a default route
 $f3->route('GET /', function() {
-    echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
+    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
 
     //Render view page.
-    //$view = new Template();
-    //echo $view->render("views/");
+    $view = new Template();
+    echo $view->render("views/home-page.html");
 });
 
 // Run fat free

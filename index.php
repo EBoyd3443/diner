@@ -24,5 +24,32 @@ $f3->route('GET /', function() {
     echo $view->render("views/home-page.html");
 });
 
+// Define the breakfast menu route
+$f3->route('GET /menus/breakfast', function() {
+    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
+
+    //Render view page.
+    $view = new Template();
+    echo $view->render("views/breakfast-menu.html");
+});
+
+// Define the lunch menu route
+$f3->route('GET /menus/lunch', function() {
+    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
+
+    //Render view page.
+    $view = new Template();
+    echo $view->render("views/lunch-menu.html");
+});
+
+// Define the dinner menu route
+$f3->route('GET /menus/dinner', function() {
+    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
+
+    //Render view page.
+    $view = new Template();
+    echo $view->render("views/dinner-menu.html");
+});
+
 // Run fat free
 $f3->run();

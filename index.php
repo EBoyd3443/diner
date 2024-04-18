@@ -86,11 +86,44 @@ $f3->route('GET|POST /order1', function($f3) {
 $f3->route('GET|POST /order2', function($f3) {
     //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
 
-    var_dump( $f3->get('SESSION'));
+    //var_dump($f3->get('SESSION'));
+    //check for request method
+    if($_SERVER['REQUEST_METHOD'] == "POST")
+    {
+        $customs = $_POST['custom-conds'];
+        $condiments = implode(', ', $_POST['conds']);
+
+        //if data valid
+        if(!empty($customs))//very simple validation for example
+        {
+            //add data to session array
+            $f3->set('SESSION.condiments', $customs);
+        }
+        if(!empty($condiments))
+        {
+            $f3->set('SESSION.condiments',
+                $f3->get('SESSION.condiments').', '.$condiments);
+        }
+        if(empty($condiments) && empty($customs))
+        {
+            $f3->set('SESSION.condiments', "None");
+        }
+        //send the user to the next form
+        $f3->reroute('summary');
+    }
 
     //Render view page.
     $view = new Template();
     echo $view->render("views/order2.html");
+});
+
+// Define the summary route
+$f3->route('GET /summary', function($f3) {
+    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
+
+    //Render view page.
+    $view = new Template();
+    echo $view->render("views/order-summary.html");
 });
 
 // Run fat free

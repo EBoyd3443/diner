@@ -11,6 +11,7 @@ error_reporting(E_ALL);
 
 // Require the autoloader
 require_once("vendor/autoload.php");
+require_once("model/data-layer.php");
 
 // Instantiate the f3 base class
 $f3 = Base::instance();
@@ -54,7 +55,7 @@ $f3->route('GET /menus/dinner', function() {
 // Define the order1 route
 $f3->route('GET|POST /order1', function($f3) {
     //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
-
+    $f3->set('meals', getMeals());
     //If the method has been posted
     if($_SERVER['REQUEST_METHOD'] == "POST")
     {
@@ -86,6 +87,7 @@ $f3->route('GET|POST /order1', function($f3) {
 $f3->route('GET|POST /order2', function($f3) {
     //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
 
+    $f3->set('condiments', getCondiments());
     //var_dump($f3->get('SESSION'));
     //check for request method
     if($_SERVER['REQUEST_METHOD'] == "POST")

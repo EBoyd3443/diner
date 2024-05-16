@@ -6,127 +6,153 @@
 // 328/diner/index.php
 // This is our fat free controller
 
+// Turn on error reporting
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Require the autoloader
-require_once("vendor/autoload.php");
-require_once("model/data-layer.php");
+// Require the necessary files
+require_once('vendor/autoload.php');
 
-// Instantiate the f3 base class
+// Instantiate the F3 Base class
 $f3 = Base::instance();
 
 // Define a default route
-$f3->route('GET /', function() {
-    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
+// https://tostrander.greenriverdev.com/328/hello-fat-free/
+$f3->route('GET /', function () {
+    //echo '<h1>Hello from My Diner App!</h1>';
 
-    //Render view page.
+    // Render a view page
     $view = new Template();
-    echo $view->render("views/home-page.html");
+    echo $view->render('views/home-page.html');
 });
 
-// Define the breakfast menu route
-$f3->route('GET /menus/breakfast', function() {
-    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
+// Breakfast menu
+$f3->route('GET /menus/breakfast', function () {
+    //echo '<h1>My Breakfast Menu</h1>';
 
-    //Render view page.
+    // Render a view page
     $view = new Template();
-    echo $view->render("views/breakfast-menu.html");
+    echo $view->render('views/breakfast-menu.html');
 });
 
-// Define the lunch menu route
-$f3->route('GET /menus/lunch', function() {
-    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
+// Lunch menu
+$f3->route('GET /menus/lunch', function () {
+    //echo '<h1>My Breakfast Menu</h1>';
 
-    //Render view page.
+    // Render a view page
     $view = new Template();
-    echo $view->render("views/lunch-menu.html");
+    echo $view->render('views/lunch-menu.html');
 });
 
-// Define the dinner menu route
-$f3->route('GET /menus/dinner', function() {
-    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
+// Dinner menu
+$f3->route('GET /menus/dinner', function () {
+    //echo '<h1>My Breakfast Menu</h1>';
 
-    //Render view page.
+    // Render a view page
     $view = new Template();
-    echo $view->render("views/dinner-menu.html");
+    echo $view->render('views/dinner-menu.html');
 });
 
-// Define the order1 route
-$f3->route('GET|POST /order1', function($f3) {
-    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
-    $f3->set('meals', getMeals());
-    //If the method has been posted
-    if($_SERVER['REQUEST_METHOD'] == "POST")
-    {
-        $food = $_POST['food'];
-        $meal = $_POST['meal'];
+// Order Summary
+$f3->route('GET /summary', function ($f3) {
 
-        //if data valid
-        if(!empty($food) && !empty($meal))//very simple validation for example
-        {
-            //add data to session array
-            $f3->set('SESSION.food', $food);
-            $f3->set('SESSION.meal', $meal);
-            //send the user to the next form
+    // Write data to database
+
+
+    // Render a view page
+    $view = new Template();
+    echo $view->render('views/order-summary.html');
+
+    //var_dump ( $f3->get('SESSION') );
+    session_destroy();
+});
+
+// Order Form Part I
+$f3->route('GET|POST /order1', function ($f3) {
+    //echo '<h1>My Breakfast Menu</h1>';
+
+    // Initialize variables
+    $food = "";
+    $meal = "";
+
+    // If the form has been posted
+    if ($_SERVER['REQUEST_METHOD'] == "POST") {
+
+        //echo "<p>You got here using the POST method</p>";
+        //var_dump ($_POST);
+
+        // Get the data from the post array
+        //var_dump($_POST);
+        if (Validate::validFood($_POST['food'])) {
+            $food = $_POST['food'];
+        } else {
+            $f3->set('errors["food"]', 'Please enter a food');
+        }
+
+        if (isset($_POST['meal']) and Validate::validMeal($_POST['meal'])) {
+            $meal = $_POST['meal'];
+        } else {
+            $f3->set('errors["meal"]', 'Please select a meal');
+        }
+
+        // Add the data to the session array
+        $order = new Order($food, $meal);
+        $f3->set('SESSION.order', $order);
+
+        // If there are no errors,
+        // Send the user to the next form
+        if (empty($f3->get('errors'))) {
             $f3->reroute('order2');
         }
+    }
+
+    // Get the data from the model
+    // and add it to the F3 hive
+    $meals = DataLayer::getMeals();
+    $f3->set('meals', $meals);
+
+    // Render a view page
+    $view = new Template();
+    echo $view->render('views/order1.html');
+});
+
+// Order Form Part II
+$f3->route('GET|POST /order2', function ($f3) {
+
+    var_dump($f3->get('SESSION'));
+
+    // If the form has been posted
+    if ($_SERVER['REQUEST_METHOD'] == "POST") {
+
+        //var_dump($_POST);
+        // Get the data from the post array
+        if (isset($_POST['conds']))
+            $condiments = implode(", ", $_POST['conds']);
         else
-        {
-            echo "<p>Validation failed</p>"; //Temporary! Don't mix code types.
+            $condiments = "None selected";
+
+        // If the data valid
+        if (true) {
+
+            // Add the data to the session array
+            $f3->get('SESSION.order')->setCondiments($condiments);
+
+            // Send the user to the next form
+            $f3->reroute('summary');
+        } else {
+            // Temporary
+            echo "<p>Validation errors</p>";
         }
     }
 
+    // Get the data from the model
+    $condiments = DataLayer::getCondiments();
+    $f3->set('condiments', $condiments);
 
-    //Render view page.
+    // Render a view page
     $view = new Template();
-    echo $view->render("views/order1.html");
+    echo $view->render('views/order2.html');
 });
 
-// Define the order2 route
-$f3->route('GET|POST /order2', function($f3) {
-    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
-
-    $f3->set('condiments', getCondiments());
-    //var_dump($f3->get('SESSION'));
-    //check for request method
-    if($_SERVER['REQUEST_METHOD'] == "POST")
-    {
-        $customs = $_POST['custom-conds'];
-        $condiments = implode(', ', $_POST['conds']);
-
-        //if data valid
-        if(!empty($customs))//very simple validation for example
-        {
-            //add data to session array
-            $f3->set('SESSION.condiments', $customs);
-        }
-        if(!empty($condiments))
-        {
-            $f3->set('SESSION.condiments',
-                $f3->get('SESSION.condiments').', '.$condiments);
-        }
-        if(empty($condiments) && empty($customs))
-        {
-            $f3->set('SESSION.condiments', "None");
-        }
-        //send the user to the next form
-        $f3->reroute('summary');
-    }
-
-    //Render view page.
-    $view = new Template();
-    echo $view->render("views/order2.html");
-});
-
-// Define the summary route
-$f3->route('GET /summary', function($f3) {
-    //echo '<h1>Hello Diners. Welcome to My Diner App!</h1>';
-
-    //Render view page.
-    $view = new Template();
-    echo $view->render("views/order-summary.html");
-});
-
-// Run fat free
+// Run Fat-Free
 $f3->run();

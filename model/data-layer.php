@@ -7,5 +7,6 @@ function getMeals()
 
 function getCondiments()
 {
-    return array('Ketchup', 'Mustard', 'Sriracha', 'Sour Cream');
+    return array('ketchup', 'mustard', 'sriracha', 'sour cream');
 }
+
